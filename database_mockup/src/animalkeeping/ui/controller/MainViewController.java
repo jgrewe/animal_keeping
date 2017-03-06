@@ -6,6 +6,7 @@ import animalkeeping.model.SupplierType;
 import animalkeeping.ui.*;
 import animalkeeping.util.Dialogs;
 import animalkeeping.util.EntityHelper;
+import com.apple.eawt.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -36,6 +37,8 @@ public class MainViewController extends VBox implements Initializable{
     @FXML private Menu speciesTypeMenu;
     @FXML private Menu subjectTypeMenu;
     @FXML private Menu supplierMenu;
+    @FXML private MenuBar menuBar;
+
     private Vector<TitledPane> panes;
     private HashMap<String, View> views;
 
@@ -55,6 +58,9 @@ public class MainViewController extends VBox implements Initializable{
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        menuBar.setUseSystemMenuBar(true);
+        Application.getApplication().setQuitHandler((quitEvent, quitResponse) -> closeApplication());
+        Application.getApplication().setQuitStrategy(QuitStrategy.CLOSE_ALL_WINDOWS);
         findBox.getItems().clear();
         findBox.getItems().addAll("Person", "Subject", "Housing unit", "Treatment");
         findBox.getSelectionModel().select("Subject");
