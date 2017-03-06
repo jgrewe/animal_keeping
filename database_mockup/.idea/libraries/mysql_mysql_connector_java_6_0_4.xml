@@ -12,14 +12,6 @@
       <root url="jar://$USER_HOME$/file:/home/grewe/projects/programming/animal_keeping_ui/database_mockup/lib/mysql-connector-java-6.0.4.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES>
-      <root url="jar://$USER_HOME$/file:/home/grewe/projects/programming/animal_keeping_ui/database_mockup/lib/mysql-connector-java-6.0.4-sources.jar!/" />
-      <root url="jar://$USER_HOME$/file:/home/grewe/projects/programming/animal_keeping_ui/database_mockup/lib/mysql-connector-java-6.0.4-sources.jar!/" />
-      <root url="jar://$USER_HOME$/file:/home/grewe/projects/programming/animal_keeping_ui/database_mockup/lib/mysql-connector-java-6.0.4-sources.jar!/" />
-      <root url="jar://$USER_HOME$/file:/home/grewe/projects/programming/animal_keeping_ui/database_mockup/lib/mysql-connector-java-6.0.4-sources.jar!/" />
-      <root url="jar://$USER_HOME$/file:/home/grewe/projects/programming/animal_keeping_ui/database_mockup/lib/mysql-connector-java-6.0.4-sources.jar!/" />
-      <root url="jar://$USER_HOME$/file:/home/grewe/projects/programming/animal_keeping_ui/database_mockup/lib/mysql-connector-java-6.0.4-sources.jar!/" />
-      <root url="jar://$USER_HOME$/file:/home/grewe/projects/programming/animal_keeping_ui/database_mockup/lib/mysql-connector-java-6.0.4-sources.jar!/" />
-    </SOURCES>
+    <SOURCES />
   </library>
 </component>
