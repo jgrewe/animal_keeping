@@ -8,6 +8,7 @@ import javafx.collections.transformation.SortedList;
 import javafx.concurrent.Task;
 import javafx.stage.FileChooser;
 import javafx.util.Pair;
+import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.*;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
@@ -93,7 +94,8 @@ public class XlsxExport {
         if (wb == null) {
             wb = new XSSFWorkbook();
         }
-        XSSFSheet sheet = wb.createSheet(unit.getName());
+        String sheetName = WorkbookUtil.createSafeSheetName(unit.getName());
+        XSSFSheet sheet = wb.createSheet(sheetName);
         exportPopulation(unit, sheet);
     }
 
@@ -147,7 +149,6 @@ public class XlsxExport {
             return;
         }
         XSSFWorkbook[] workbooks = {null};
-
         Task<Void> exportTask = new Task<Void>() {
             @Override
             protected Void call() throws Exception {
@@ -156,6 +157,7 @@ public class XlsxExport {
                 List<License> licenses = getLicenseList(interval.getKey(), interval.getValue());
                 for (License l : licenses) {
                     String sheetName = l.getName();
+                    sheetName = WorkbookUtil.createSafeSheetName(sheetName);
                     XSSFSheet sheet = workbooks[0].createSheet(sheetName);
                     exportLicense(l, sheet, interval.getKey(), interval.getValue());
                 }
