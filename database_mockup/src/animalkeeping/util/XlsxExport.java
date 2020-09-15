@@ -11,6 +11,7 @@ import javafx.util.Pair;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.apache.poi.xssf.usermodel.*;
 import org.hibernate.Session;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
 
 import java.io.File;
@@ -342,14 +343,28 @@ public class XlsxExport {
                 // write a detailed stocklist
                 try {
                     Session session = Main.sessionFactory.openSession();
-                    String q = "From Housing where end_datetime is NULL OR " +
-                            "(end_datetime is not Null AND end_datetime < :end AND end_datetime > :start AND subject not in " +
-                            "(select distinct subject from Housing where end_datetime is NULL))";
+                    NativeQuery<Housing> nq = session.createNativeQuery("select h.id, h.subject_id, h.start_datetime, h.end_datetime, h.type_id, h.comment from census_housing h" +
+                            " INNER JOIN (select hs.subject_id, max(hs.end_datetime) edt from census_housing hs where hs.end_datetime is not NULL " +
+                            " AND hs.end_datetime > :start AND hs.end_datetime < :end AND " +
+                            " hs.subject_id not in (select subject_id from census_housing where end_datetime is NULL) GROUP BY hs.subject_id) b " +
+                            " ON h.subject_id = b.subject_id and h.end_datetime = b.edt ORDER BY b.edt", Housing.class);
+                    nq.setParameter("start", interval.getKey());
+                    nq.setParameter("end", interval.getValue());
+                    List<Housing> past_housings = nq.list();
+                    // select h.id, h.subject_id, h.end_datetime from census_housing
+                    // INNER JOIN (select hs.subject_id, max(hs.end_datetime) edt from
+                    // census_housing hs where hs.end_datetime is not NULL AND hs.end_datetime > '2015-01-01' AND
+                    // hs.end_datetime < '2015-31-12' GROUP BY hs.subject_id) b
+                    // ON h.subject_id = b.subject_id and h.end_datetime = b.edt;
+                    String q = "From Housing where end_datetime is NULL AND start_datetime > :start AND start_datetime < :end";
+                    //        "(end_datetime is not Null AND end_datetime < :end AND end_datetime > :start AND subject not in " +
+                    //            "(select distinct subject from Housing where end_datetime is NULL))";
                     Query query = session.createQuery(q, Housing.class);
                     query.setParameter("start", interval.getKey());
                     query.setParameter("end", interval.getValue());
                     session.beginTransaction();
                     currentHousings = query.list();
+                    currentHousings.addAll(past_housings);
                     session.getTransaction().commit();
                     session.close();
                 } catch (Exception e) {
@@ -380,14 +395,11 @@ public class XlsxExport {
                     String reason = "";
                     if (h.getEnd() != null) {
                         ArrayList<Treatment> ts = new ArrayList<>(h.getSubject().getTreatments());
-                        Treatment last = null;
-                        if (ts.size() > 0) {
-                            last = ts.get(ts.size() - 1);
-                        }
-                        if (last != null && last.getEnd() != null) {
-                            String treatment_day = df.format(last.getEnd());
-                            String housing_end = df.format(h.getEnd());
-                            reason = treatment_day.equals(housing_end) ? "used in experiment" : " ";
+                        for (Treatment t : ts) {
+                            if (t.getTreatmentType().isFinalExperiment()) {
+                                reason = t.getTreatmentType().isFinalExperiment() ? "used in experiment" : " ";
+                                break;
+                            }
                         }
                     }
                     Object [] objectArr = {h.getSubject().getSpeciesType().getName(), h.getSubject().getName(),
